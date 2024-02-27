@@ -1,7 +1,7 @@
 from django.test import TestCase, SimpleTestCase, Client, RequestFactory
 from django.urls import reverse, resolve
-from .views import Project_List, Project_Detail
-from .models import Project
+from . import views
+from .models import Project, Tag, Review
 
 
 class TestUrls(TestCase):
@@ -31,7 +31,7 @@ class TestUrls(TestCase):
 
     def test_project_list_url_is_resolved(self):
         view = resolve(reverse("projects:project_list"))
-        self.assertEqual(view.func.__name__, Project_List.as_view().__name__)
+        self.assertEqual(view.func.__name__, views.ProjectListView.as_view().__name__)
 
 
     def test_project_detail_url_is_OK(self):
@@ -42,7 +42,7 @@ class TestUrls(TestCase):
 
     def test_project_detail_url_is_resolved(self):
         view = resolve(reverse("projects:project_detail", args=(self.new_project_id,)))
-        self.assertEqual(view.func.__name__, Project_Detail.as_view().__name__)
+        self.assertEqual(view.func.__name__, views.ProjectDetailView.as_view().__name__)
 
 
     def test_wrong_url(self):
@@ -73,10 +73,31 @@ class TestViews(TestCase):
 
     def test_project_list_view_logic(self):
             response = self.client.get(reverse('projects:project_list'))
-            query_set = Project_List.get_queryset(self)
+            query_set = views.ProjectListView.get_queryset(self)
             self.assertQuerySetEqual(response.context["projects"], query_set)
-    
+
     def test_project_detail_view_template(self):
         url = reverse('projects:project_detail', args=(self.new_project_id,))
         response = self.client.get(url)
         self.assertTemplateUsed(response, "projects/project_detail.html")
+
+class TestModels(TestCase):
+
+    def test_project_model(self):
+        obj = Project.objects.create(title="John")
+        self.assertEqual(obj.title, "John")
+
+    def test_tag_model(self):
+        obj = Tag.objects.create(name="Django")
+        self.assertEqual(obj.name, "Django")
+
+    def test_review_model(self):
+        # tests if a review saves
+        # tests if a review record if deleted
+        # when it's parent record (project) is deleted
+        obj = Project.objects.create(title="Alexandria")
+        obj1 = Review.objects.create(value="great", project=obj)
+        self.assertEqual(obj1.value, "great")
+        obj.delete()
+        record = Review.objects.filter(value="great").exists()
+        self.assertEqual(record, False)

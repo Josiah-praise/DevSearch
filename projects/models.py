@@ -1,5 +1,6 @@
 from django.db import models
 import uuid
+from django.urls import reverse
 
 class Project(models.Model):
     '''
@@ -18,6 +19,10 @@ class Project(models.Model):
 
     def __str__(self) -> str:
         return self.title
+    
+    def get_absolute_url(self):
+        # returns the url for a project instance
+        return reverse("projects:project_detail", kwargs={"pk": self.id})
 
 class Review(models.Model):
     '''

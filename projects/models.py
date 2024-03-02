@@ -1,11 +1,13 @@
 from django.db import models
 import uuid
+from users.models import CustomUser
 from django.urls import reverse
 
 class Project(models.Model):
     '''
     Project table
     '''
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     demo_link = models.URLField(max_length=2000, null=True, blank=True)

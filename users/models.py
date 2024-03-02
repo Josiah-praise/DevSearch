@@ -16,6 +16,10 @@ class Socials(models.Model):
     """
     Stores different social links for a custom user
     """
+
+    class Meta:
+        verbose_name = 'Social' # singular model name
+        verbose_name_plural = 'Socials' # plural model name
     instagram = models.URLField(max_length=500, null=True, blank=True)
     facebook = models.URLField(max_length=500, null=True, blank=True)
     github = models.URLField(max_length=500, null=True, blank=True)

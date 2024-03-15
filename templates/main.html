@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -26,6 +27,15 @@
   </head>
   <body>
     {% include 'navbar.html' %}
+
+    {% for message in messages %}
+
+    <div class="alert alert--{{message.tags}}">
+      <p class="alert__message">{{message}}</p>
+      <button class="alert__close">x</button>
+    </div>
+
+    {% endfor %}
     
     {% block content %}
 
@@ -34,9 +44,10 @@
    
     
     {% endblock content %}
-    <hr />
+
     <footer>
-      <h2>Footer</h2>
+
     </footer>
   </body>
+  <script src="{% static 'uikit/app.js' %}"></script>
 </html>

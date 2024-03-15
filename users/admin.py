@@ -13,7 +13,10 @@ class CustomUserAdmin(UserAdmin):
     # display and change
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal Info', {'fields': ('first_name', 'last_name', 'email', 'social_youtube', 'short_intro', 'bio', 'location', 'social_linkedin', 'social_github', 'social_website', 'profile_image')}),
+        ('Personal Info', {'fields': 
+            ('first_name', 'last_name', 'email', 'social_youtube', 'short_intro',
+             'bio', 'location', 'social_linkedin', 'social_github', 'social_twitter',
+             'social_website', 'profile_image')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )

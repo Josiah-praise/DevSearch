@@ -24,5 +24,3 @@ class ProjectForm(ModelForm):
         # a dictionary of attribute to value
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'input'})
-            
-        

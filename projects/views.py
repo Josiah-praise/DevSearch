@@ -10,23 +10,23 @@ from django.views.generic import (
 )
 from .models import Project
 from .forms import ProjectForm
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class ProjectListView(ListView):
+class ProjectListView(LoginRequiredMixin, ListView):
     model = Project
     context_object_name = 'projects'
     # template_name = 'index.html'
     def get_queryset(self) -> QuerySet[Any]:
-        return Project.objects.all().order_by('created')
+        return Project.objects.all().order_by('-created')
 
 
-class ProjectDetailView(DetailView):
+class ProjectDetailView(LoginRequiredMixin, DetailView):
     model = Project
     context_object_name = 'project'
 
-
-class ProjectCreateView(CreateView):
+class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project
     form_class = ProjectForm
     # default template name is app/model_form.html
@@ -35,11 +35,11 @@ class ProjectCreateView(CreateView):
     # if your model has the method get_absolute_url()
     # which sould return the url for that specific object
 
-class ProjectUpdateView(UpdateView):
+class ProjectUpdateView(LoginRequiredMixin, UpdateView):
     model = Project
     fields = '__all__'
     success_url = reverse_lazy("projects:project_list")
 
-class ProjectDeleteView(DeleteView):
+class ProjectDeleteView(LoginRequiredMixin, DeleteView):
     model = Project
     success_url = reverse_lazy("projects:project_list")

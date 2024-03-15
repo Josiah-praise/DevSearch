@@ -1,9 +1,34 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, User
 import uuid
+from django.urls import reverse
+from django.contrib.auth.models import UserManager
+from django.contrib.auth import get_user_model
+
+
+class CustomManager(UserManager):
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
+        '''
+        creates a superuser and save it
+        '''
+        if email is None:
+            raise ValueError("Email cannot be null")
+
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields["is_staff"] is not True:
+            raise ValueError("is_staff should be set to True")
+
+        if extra_fields["is_superuser"] is not True:
+            raise ValueError("is_superuser should be set to True")
+
+        return self._create_user(username, email, password, **extra_fields)
 
 
 class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
     short_intro = models.CharField(max_length=200, blank=True, null=True)
     bio = models.TextField(null=True, blank=True)
     location = models.CharField(max_length=500, blank=True, null=True)
@@ -15,22 +40,25 @@ class CustomUser(AbstractUser):
     social_youtube = models.URLField(null=True, blank=True, max_length=1500)
     created_at = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False, unique=True)
+    
+    
+    # when you use the authenticate function, it takes two values
+    # username and password. This is because the USERNAME_FIELD on the
+    # AbstractBaseUser is set to "username". If you want to use a different field
+    # for authentication, set the field to unique and then alter the USERNAME_FIELD
+    # attribute to use that field.
+    EMAIL_FIELD = "email"
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
 
-""" class Socials(models.Model):
+    object = CustomManager()
+    def __str__(self):
+        return self.get_full_name()
+    
+    def get_absolute_url(self):
+        return reverse('users:user_detail', args=(self.id,))
 
-    Stores different social links for a custom user
 
-
-    class Meta:
-        verbose_name = 'Social' # singular model name
-        verbose_name_plural = 'Socials' # plural model name
-
-    instagram = models.URLField(max_length=500, null=True, blank=True)
-    facebook = models.URLField(max_length=500, null=True, blank=True)
-    github = models.URLField(max_length=500, null=True, blank=True)
-    youtube = models.URLField(max_length=500, null=True, blank=True)
-    stackoverflow = models.URLField(max_length=500, null=True, blank=True)
-    website = models.URLField(max_length=500, null=True, blank=True) """
     
 class Skill(models.Model):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)

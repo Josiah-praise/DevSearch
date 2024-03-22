@@ -102,7 +102,7 @@ def userAccount(request):
 def editAccount(request):
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
-        
+     
         if form.is_valid():
             user = form.save()
             return redirect('users:account')

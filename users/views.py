@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import CustomUser
+from .models import CustomUser, Skill
 from django.views.generic import ListView
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import CustomUserCreationForm, UserUpdateForm
+from .forms import CustomUserCreationForm, UserUpdateForm, Addskill
 from django.contrib.auth import get_user_model
 
 
@@ -25,11 +25,11 @@ def users(request, pk):
 
 
 def UserLogin(request):
-    
     page = 'login'
     # if a logged in user tries to access this view with the bare url
     if request.user.is_authenticated:
-        return redirect(reverse('users:user_list'))
+        return redirect('users:user_list')
+
     next = request.GET.get('next', None)
 
     if request.method == "POST":
@@ -43,12 +43,11 @@ def UserLogin(request):
             messages.success(request, f'Welcome {user.get_full_name()}')
             if next is not None:
                 return redirect(next)
-            return redirect(reverse('users:user_list'))
+            return redirect('users:user_list')
         else:
             context = {
                 'next': next,
                 'email': email,
-                #'password': password it's prolly not safe to send password to the raw template
                 'page': page
             }
             messages.error(request, "Password/Username is incorrect")
@@ -59,7 +58,7 @@ def UserLogin(request):
 def UserLogout(request):
     logout(request)
     messages.info(request, "You've been logged out")
-    return redirect(reverse('users:login'))
+    return redirect('users:login')
 
 class UserListView(LoginRequiredMixin, ListView):
     model = CustomUser
@@ -68,12 +67,12 @@ class UserListView(LoginRequiredMixin, ListView):
 
 
 def register(request):
-    
     if request.user.is_authenticated:
         return redirect(reverse('users:user_detail', args=(request.user.id,)))
 
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
+
         if form.is_valid():
             user = form.save()
             login(request, user)
@@ -92,28 +91,84 @@ def register(request):
 def userAccount(request):
     user = request.user
     skills = user.skill_set.all()
-    
+
     context = {
         'user': user,
         'skills': skills
     }
-    messages.info(request, f"Welcome {user.get_full_name()}")
     return render(request, 'users/account.html', context)
 
 @login_required
 def editAccount(request):
-
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         
         if form.is_valid():
             user = form.save()
-            return redirect(reverse('users:account'))
+            return redirect('users:account')
         else:
             return render(request, 'users/user_form.html', {'form': form})
     else:
         form = UserUpdateForm(instance=request.user)
+
     context = {
         'form': form,
     }
     return render(request, 'users/user_form.html', context)
+
+@login_required
+def addskill(request):
+    if request.method == "POST":
+        form = Addskill(request.POST)
+        if form.is_valid():
+            skill = form.save(commit=False)
+            skill.owner = request.user
+            skill.save()
+            return redirect("users:account")
+        else:
+            return render(request, "users/skill_form.html", {"form": form})
+    else:
+        form = Addskill()
+        context = {
+            "form": form
+        }
+        return render(request, "users/skill_form.html", context)
+
+            
+@login_required
+def updateskill(request, pk):
+    user = request.user
+
+    if not user.skill_set.filter(id=pk).exists():
+        return redirect(reverse("users:account"))
+
+    skill = Skill.objects.get(id=pk)
+
+    if request.method == "POST":
+        form = Addskill(request.POST, instance=skill)
+
+        if form.is_valid():
+            form.save()
+            return redirect(reverse("users:account"))
+        else:
+            return render(request, "users/skill_form.html", {"form": form})
+
+    form = Addskill(instance=skill)
+    return render(request, "users/skill_form.html", {"form": form})
+
+@login_required
+def delete_skill(request, pk):
+    user = request.user
+
+    if user.skill_set.filter(id=pk).exists():
+        skill = user.skill_set.get(id=pk)
+        next = request.GET.get('next', '')
+        context = {'object': skill, 'next': next}
+    else:
+        return redirect("users:account")
+
+    if request.method == 'POST':
+        skill.delete()
+        messages.success(request, "Delete Sucessful")
+        return redirect("users:account")
+    return render(request, 'confirm_delete.html', context)

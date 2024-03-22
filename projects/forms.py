@@ -8,14 +8,17 @@ class ProjectForm(ModelForm):
         model = Project
         fields = [
             'title', 'image', 'description',
-            'demo_link', 'source_link', 'tags'
+            'demo_link', 'source_link', 'tags',
             ]
         widgets = {
             'tags': forms.CheckboxSelectMultiple(),
         }
 
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # self.fields['owner'].widget = forms.HiddenInput()
         # self.fields is a dict containg a maping of form field names
         # to form field instances
         # the form field instances have a widget attribute which

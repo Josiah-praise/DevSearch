@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django import forms
+from . import models
 
 
 class CustomUserChangeForm(UserChangeForm):
@@ -74,3 +75,14 @@ class UserForm(forms.ModelForm):
             }
         }
 """
+
+class Addskill(forms.ModelForm):
+    class Meta:
+        model = models.Skill
+        fields = ['name', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "input"

@@ -2,29 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, User
 import uuid
 from django.urls import reverse
-from django.contrib.auth.models import UserManager
 from django.contrib.auth import get_user_model
-
-
-class CustomManager(UserManager):
-    def create_superuser(self, username, email=None, password=None, **extra_fields):
-        '''
-        creates a superuser and save it
-        '''
-        if email is None:
-            raise ValueError("Email cannot be null")
-
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_active", True)
-        extra_fields.setdefault("is_superuser", True)
-
-        if extra_fields["is_staff"] is not True:
-            raise ValueError("is_staff should be set to True")
-
-        if extra_fields["is_superuser"] is not True:
-            raise ValueError("is_superuser should be set to True")
-
-        return self._create_user(username, email, password, **extra_fields)
+from .customManagers import DeveloperFilter, CustomManager
 
 
 class CustomUser(AbstractUser):
@@ -52,11 +31,16 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ["username"]
 
     object = CustomManager()
+    search = DeveloperFilter()
+
     def __str__(self):
         return self.get_full_name()
     
     def get_absolute_url(self):
         return reverse('users:user_detail', args=(self.id,))
+    
+    class Meta:
+        ordering = ["created_at"]
 
 
     

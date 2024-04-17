@@ -5,7 +5,7 @@ app_name = 'users'
 
 urlpatterns = [
     # test view
-    path('', views.UserListView.as_view(), name='user_list'),
+    path('', views.UserList, name='user_list'),
     path('detail/<str:pk>', views.users, name='user_detail'),
     path('login', views.UserLogin, name='login'),
     path('logout', views.UserLogout, name='logout'),
@@ -14,5 +14,5 @@ urlpatterns = [
     path('edit-account', views.editAccount, name='edit_account'),
     path('add_skill', views.addskill, name='add_skill'),
     path('update_skill/<str:pk>', views.updateskill, name='update_skill'),
-    path('delete_skill/<str:pk>', views.delete_skill, name='delete_skill')
+    path('delete_skill/<str:pk>', views.delete_skill, name='delete_skill'),
 ]

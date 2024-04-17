@@ -1,0 +1,19 @@
+
+
+<div class="pagination">
+  <ul class="container">
+    {% if start-1 > 0 %}
+    <li><a href="?page={{start-1}}" class="btn btn--disabled">&#10094; Prev</a></li>
+    {% endif %}
+
+    {% for page in start..end %}
+    <li><a href="?page={{page}}" class="btn btn--sub">{{page}}</a></li>
+    {% endfor %}
+
+    {% if end+1 < num_pages %}
+    <li><a href="?pages={{end+1}}" class="btn">Next &#10095;</a></li>
+    {% endif %}
+  </ul>
+</div>
+
+

@@ -60,11 +60,21 @@ def UserLogout(request):
     messages.info(request, "You've been logged out")
     return redirect('users:login')
 
-class UserListView(LoginRequiredMixin, ListView):
-    model = CustomUser
-    context_object_name = 'users'
-    template_name = 'users/user_list.html'
 
+def developer_search(request):
+    q = request.GET.get("search_query", '')
+    result =\
+        CustomUser.search.search(q_string=q) if q else CustomUser.objects.all()
+    context = {
+        "users": result,
+        "q": q
+    }
+    return context
+
+@login_required
+def UserList(request):
+    context = developer_search(request)
+    return render(request, 'users/user_list.html', context)
 
 def register(request):
     if request.user.is_authenticated:
@@ -172,3 +182,5 @@ def delete_skill(request, pk):
         messages.success(request, "Delete Sucessful")
         return redirect("users:account")
     return render(request, 'confirm_delete.html', context)
+
+

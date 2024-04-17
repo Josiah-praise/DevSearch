@@ -5,25 +5,30 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic import (
-    ListView,
     DetailView,
     CreateView,
     UpdateView,
-    DeleteView
 )
 from .models import Project
+from users.models import CustomUser
 from .forms import ProjectForm
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from .utils import paginate, search
 
 
-class ProjectListView(LoginRequiredMixin, ListView):
-    model = Project
-    context_object_name = 'projects'
-    # template_name = 'index.html'
-    def get_queryset(self) -> QuerySet[Any]:
-        return Project.objects.all().order_by('-created')
+
+
+def ProjectList(request):
+    context = search(request, Project, "projects")
+    query_set, right_index, left_index, num_pages = paginate(request, 1, context["projects"])
+    context["projects"] = query_set
+    context["start"] = left_index
+    context["end"] = left_index
+    context["num_pages"] = num_pages
+    # print(query_set.has_other_pages())
+    return render (request, "projects/project_list.html", context)
 
 
 class ProjectDetailView(LoginRequiredMixin, DetailView):
@@ -33,34 +38,18 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
 class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project
     form_class = ProjectForm
-    
+    success_url = reverse_lazy("users:account")
+
     # link the project to the logged-in user
     # form valid is your hook for getting the valid form before saving2
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         form.instance.owner = self.request.user
         return super().form_valid(form)
-    
-    # 
-    """ def get_form_kwargs(self) -> dict[str, Any]:
-        kwargs =  super().get_form_kwargs()
-        kwargs['owner'] = self.request.user
-        return kwargs """
-    
-    # populates your form with some initial values
-    """ def get_initial(self) -> dict[str, Any]:
-        initial = super().get_initial()
-        initial['owner'] = self.request.user
-        return initial """
-    # default template name is app/model_form.html
-    # success_url = reverse_lazy("projects:project_list")
-    # you don't need to set success url
-    # if your model has the method get_absolute_url()
-    # which sould return the url for that specific object
 
 class ProjectUpdateView(LoginRequiredMixin, UpdateView):
     model = Project
     form_class = ProjectForm
-    success_url = reverse_lazy("projects:project_list")
+    success_url = reverse_lazy("users:account")
 
 @login_required
 def delete_project(request, pk):
@@ -71,9 +60,11 @@ def delete_project(request, pk):
         context = {'object': project, 'next': next}
     else:
         return redirect("users:account")
-    
+
     if request.method == 'POST':
         project.delete()
         messages.success(request, "Delete Sucessful")
         return redirect("users:account")
     return render(request, 'confirm_delete.html', context)
+
+

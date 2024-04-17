@@ -15,7 +15,7 @@
                     <div class="form__field">
                         <label for="formInput#search">Search By Projects </label>
                         <input class="input input--text" id="formInput#search" type="text" name="search_query"
-                            placeholder="Search by Project Title" value="" />
+                            placeholder="Search by Project Title" value="{{q}}" />
                     </div>
 
                     <input class="btn btn--sub btn--lg" type="submit" value="Search" />
@@ -33,7 +33,7 @@
                     <div class="card project">
                         <a href="{{project.get_absolute_url}}" class="project">
                             <img class="project__thumbnail" src="{{project.image.url}}" alt="project thumbnail" />
-                            <div class="card__body">
+                            <div rojects"class="card__body">
                                 <h3 class="project__title">{{project.title}}</h3>
                                 <p><a class="project__author" href="{% url 'users:user_detail' project.owner.id %}">{{project.owner}}
                                         </a>
@@ -64,3 +64,9 @@
 </main>
 
 {% endblock content %}
+
+{% block footer %}
+
+{% include 'paginator.html' with start=start end=end num_pages=num_pages %}
+
+{% endblock footer %}

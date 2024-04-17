@@ -2,11 +2,10 @@ from django.db import models
 import uuid
 from users.models import CustomUser
 from django.urls import reverse
+from .customManagers import ProjectFilter
+from django.db.models import Manager
 
 class Project(models.Model):
-    '''
-    Project table
-    '''
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
@@ -19,22 +18,24 @@ class Project(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
 
+    objects = Manager()
+    search = ProjectFilter()
+
     def __str__(self) -> str:
-        return self.title
-    
+        return str(self.title)
+
     def get_absolute_url(self):
         # returns the url for a project instance
         return reverse("projects:project_detail", kwargs={"pk": self.id})
+    
+    class Meta:
+        ordering = ["-created"]
 
 class Review(models.Model):
-    '''
-    Review table
-    '''
     value_tuple = [
         ('up', 'Up Vote'),
         ('down', 'Down Vote')
-    ]
-    #owner = 
+    ] 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     body = models.TextField(null=True, blank=True)
     value = models.CharField(choices=value_tuple, max_length=200)
@@ -51,4 +52,4 @@ class Tag(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, primary_key=True)
 
     def __str__(self):
-        return self.name
+        return str(self.name)

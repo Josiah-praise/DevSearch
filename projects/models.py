@@ -36,6 +36,7 @@ class Review(models.Model):
         ('up', 'Up Vote'),
         ('down', 'Down Vote')
     ] 
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     body = models.TextField(null=True, blank=True)
     value = models.CharField(choices=value_tuple, max_length=200)
@@ -43,7 +44,11 @@ class Review(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     
     def __str__(self):
-        return self.value
+        return str(self.value)
+    
+    class Meta:
+        unique_together = [['owner', 'project']]
+        
 
 class Tag(models.Model):
     # tag classification for projects

@@ -1,16 +1,15 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from .models import CustomUser, Skill
-from django.views.generic import ListView
+# from django.views.generic import ListView
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CustomUserCreationForm, UserUpdateForm, Addskill
-from django.contrib.auth import get_user_model
-
-
+# from django.contrib.auth import get_user_model
+from .utils import developer_search, paginate
         
 def users(request, pk):
     user = CustomUser.objects.get(id=pk)
@@ -61,19 +60,15 @@ def UserLogout(request):
     return redirect('users:login')
 
 
-def developer_search(request):
-    q = request.GET.get("search_query", '')
-    result =\
-        CustomUser.search.search(q_string=q) if q else CustomUser.objects.all()
-    context = {
-        "users": result,
-        "q": q
-    }
-    return context
+
 
 @login_required
 def UserList(request):
     context = developer_search(request)
+    query_set, _range = paginate(request, 6, context["users"])
+    context["users"] = query_set
+    context["range"] = _range
+    
     return render(request, 'users/user_list.html', context)
 
 def register(request):

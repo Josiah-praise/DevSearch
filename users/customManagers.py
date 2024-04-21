@@ -2,6 +2,9 @@ from django.db.models import Q, Manager
 from django.contrib.auth.models import UserManager
 
 class CustomManager(UserManager):
+    '''
+    custom manager for the new user model
+    '''
     def create_superuser(self, username, email=None, password=None, **extra_fields):
         if email is None:
             raise ValueError("Email cannot be null")
@@ -19,14 +22,17 @@ class CustomManager(UserManager):
         return self._create_user(username, email, password, **extra_fields)
 
 
-class DeveloperFilter(Manager):
+class UserFilter(Manager):
+    '''
+    filter users by a query string
+    '''
     def search(self, q_string=''):
-        query_set = super().all().filter(
+        query_set = super().filter(
             Q(username__icontains=q_string) |
             Q(first_name__icontains=q_string) |
             Q(last_name__icontains=q_string) |
             Q(skill__name__icontains=q_string) |
             Q(short_intro__icontains=q_string) |
             Q(bio__icontains=q_string)
-        )
+        ).distinct()
         return query_set

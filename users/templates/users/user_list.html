@@ -77,3 +77,9 @@
   </main>
 
 {% endblock content %}
+
+{% block footer %}
+
+{% include 'paginator.html' with page=users range=range q_string=q %}
+
+{% endblock footer %}

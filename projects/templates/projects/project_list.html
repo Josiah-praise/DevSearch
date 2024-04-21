@@ -1,4 +1,5 @@
 {% extends 'main.html' %}
+
 {% block content %}
 
 
@@ -67,6 +68,6 @@
 
 {% block footer %}
 
-{% include 'paginator.html' with start=start end=end num_pages=num_pages %}
+{% include 'paginator.html' with page=projects range=range q_string=q %}
 
 {% endblock footer %}

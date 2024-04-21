@@ -1,19 +1,53 @@
+{% if page.has_other_pages %}
 
+{% if q_string %}
 
 <div class="pagination">
   <ul class="container">
-    {% if start-1 > 0 %}
-    <li><a href="?page={{start-1}}" class="btn btn--disabled">&#10094; Prev</a></li>
+    {% if page.has_previous %}
+    <li><a href='?page={{page.previous_page_number}}&search_query={{q_string}}' class="btn">&#10094; Prev</a></li>
     {% endif %}
 
-    {% for page in start..end %}
-    <li><a href="?page={{page}}" class="btn btn--sub">{{page}}</a></li>
+    {% for page_ in range %}
+
+    {% if page.number == page_ %}
+    <li><a href="?page={{page_}}&search_query={{q_string}}" class="btn btn--sub">{{page_}}</a></li>
+    {% else %}
+        <li><a href="?page={{page_}}&search_query={{q_string}}" class="btn ">{{page_}}</a></li>
+    {% endif %}
+
     {% endfor %}
 
-    {% if end+1 < num_pages %}
-    <li><a href="?pages={{end+1}}" class="btn">Next &#10095;</a></li>
+    {% if page.has_next %}
+    <li><a href='?page={{page.next_page_number}}&search_query={{q_string}}' class="btn">Next &#10095;</a></li>
     {% endif %}
   </ul>
 </div>
 
+{% else %}
 
+    <div class="pagination">
+      <ul class="container">
+        {% if page.has_previous %}
+        <li><a href='?page={{page.previous_page_number}}' class="btn">&#10094; Prev</a></li>
+        {% endif %}
+
+        {% for page_ in range %}
+
+        {% if page.number == page_ %}
+        <li><a href="?page={{page_}}" class="btn btn--sub">{{page_}}</a></li>
+        {% else %}
+            <li><a href="?page={{page_}}" class="btn ">{{page_}}</a></li>
+        {% endif %}
+
+        {% endfor %}
+
+        {% if page.has_next %}
+        <li><a href='?page={{page.next_page_number}}' class="btn">Next &#10095;</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  
+{% endif %}
+
+{% endif %}

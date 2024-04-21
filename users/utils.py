@@ -1,18 +1,18 @@
+from .models import CustomUser
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
-def search(request, model_class, query_set_name='query_set'):
-    '''
-    filters records from a table using custom model managers
-    '''
+
+def developer_search(request):
     q = request.GET.get("search_query", '')
-    result = \
-        model_class.search.search(q_string=q) if q else model_class.objects.all()
+    result =\
+        CustomUser.search.search(q_string=q) if q else CustomUser.objects.all()
     context = {
-        query_set_name: result,
+        "users": result,
         "q": q
     }
     return context
+
 
 def paginate(request, result_count, q_set):
     

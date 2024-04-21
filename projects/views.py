@@ -18,16 +18,11 @@ from django.contrib.auth.decorators import login_required
 from .utils import paginate, search
 
 
-
-
 def ProjectList(request):
     context = search(request, Project, "projects")
-    query_set, right_index, left_index, num_pages = paginate(request, 1, context["projects"])
+    query_set, _range = paginate(request, 6, context["projects"])
     context["projects"] = query_set
-    context["start"] = left_index
-    context["end"] = left_index
-    context["num_pages"] = num_pages
-    # print(query_set.has_other_pages())
+    context["range"] = _range
     return render (request, "projects/project_list.html", context)
 
 

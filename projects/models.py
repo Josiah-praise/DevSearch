@@ -32,14 +32,14 @@ class Project(models.Model):
         ordering = ["-created"]
 
 class Review(models.Model):
-    value_tuple = [
+    votes = [
         ('up', 'Up Vote'),
         ('down', 'Down Vote')
-    ] 
+    ]
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     body = models.TextField(null=True, blank=True)
-    value = models.CharField(choices=value_tuple, max_length=200)
+    value = models.CharField(choices=votes, max_length=200)
     created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     

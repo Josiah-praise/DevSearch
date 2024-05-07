@@ -11,14 +11,17 @@ from django.views.generic import (
 )
 from .models import Project
 from users.models import CustomUser
-from .forms import ProjectForm
+from .forms import ProjectForm, ReviewForm
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .utils import paginate, search
 
-
+@login_required
 def ProjectList(request):
+    '''
+    list all projects
+    '''
     context = search(request, Project, "projects")
     query_set, _range = paginate(request, 6, context["projects"])
     context["projects"] = query_set
@@ -27,10 +30,24 @@ def ProjectList(request):
 
 
 class ProjectDetailView(LoginRequiredMixin, DetailView):
+    '''
+    show project details
+    '''
     model = Project
     context_object_name = 'project'
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        '''
+        pass the review form as context for rendering
+        '''
+        context = super().get_context_data(**kwargs)
+        context['form'] = ReviewForm()
+        return context
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
+    '''
+    create project
+    '''
     model = Project
     form_class = ProjectForm
     success_url = reverse_lazy("users:account")
@@ -38,22 +55,35 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
     # link the project to the logged-in user
     # form valid is your hook for getting the valid form before saving2
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        '''
+        set current user as project owner before saving project
+        '''
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
 class ProjectUpdateView(LoginRequiredMixin, UpdateView):
+    '''
+    update project
+    '''
     model = Project
     form_class = ProjectForm
-    success_url = reverse_lazy("users:account")
+    success_url = reverse_lazy("users:account") # redirect url after project update
 
 @login_required
 def delete_project(request, pk):
+    '''
+    delete project with id 'pk'
+    '''
     user = request.user
+    
+    # check if project to be deleted belongs to
+    # the logged in user
     if user.project_set.filter(id=pk).exists():
         project = user.project_set.get(id=pk)
-        next = request.GET.get('next', '')
-        context = {'object': project, 'next': next}
+        # next = request.GET.get('next', '')
+        context = {'object': project}
     else:
+        messages.error(request, "Project does not exist")
         return redirect("users:account")
 
     if request.method == 'POST':

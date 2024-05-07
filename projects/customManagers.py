@@ -10,5 +10,3 @@ class ProjectFilter(Manager):
             Q(tags__name__icontains=q_string)
         ).distinct()
         return query_set
-
-

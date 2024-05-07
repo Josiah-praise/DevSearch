@@ -28,8 +28,17 @@ class Project(models.Model):
         # returns the url for a project instance
         return reverse("projects:project_detail", kwargs={"pk": self.id})
     
+    def do_vote_total_nd_ratio(self):
+        '''
+        calculate project vote ratio and vote total
+        '''
+        self.vote_total = self.review_set.all().count()
+        positive_votes = self.review_set.filter(value='up').count()
+        self.vote_ratio = (positive_votes/self.vote_total) * 100
+        self.save()
+    
     class Meta:
-        ordering = ["-created"]
+        ordering = ["-vote_total", "-vote_ratio", "title"]
 
 class Review(models.Model):
     votes = [

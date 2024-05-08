@@ -3,7 +3,7 @@ from django.contrib.auth.models import UserManager
 
 class CustomManager(UserManager):
     '''
-    custom manager for the new user model
+    custom manager for the CustomUser model
     '''
     def create_superuser(self, username, email=None, password=None, **extra_fields):
         if email is None:
@@ -24,6 +24,7 @@ class CustomManager(UserManager):
 
 class UserFilter(Manager):
     '''
+    Custom manager for CustomUser model
     filter users by a query string
     '''
     def search(self, q_string=''):

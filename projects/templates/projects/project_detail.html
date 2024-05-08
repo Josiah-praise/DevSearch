@@ -52,6 +52,8 @@
             </h5>
 
             {% if show_form %}
+
+            {% if project.owner != request.user %}
             <form class="form" action="{% url 'projects:review' project.id %}" method="POST">
               {% csrf_token %}
 
@@ -64,6 +66,12 @@
 
               <input class="btn btn--sub btn--lg" type="submit" value="Submit" />
             </form>
+            {% else %}
+            <p>You cannot review your own project</p>
+            {% endif %}
+
+            {% else %}
+            <p>You have already submitted a review</p>
             {% endif %}
  
             <div class="commentList">

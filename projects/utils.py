@@ -15,15 +15,16 @@ def search(request, model_class, query_set_name='query_set'):
     return context
 
 def paginate(request, result_count, q_set):
-    
+    '''
+    returns paginated query_set and custom pagination
+    range
+    '''
     try:
         page_number = int(request.GET.get('page'))
     except:
         page_number = 1
 
     pages = Paginator(q_set, result_count)
-    # if not isinstance(page_number, int):
-    #     print("Nada bruv")
     try:
         query_set = pages.page(page_number)
     except EmptyPage:
@@ -41,5 +42,4 @@ def paginate(request, result_count, q_set):
         right_index = page_number + 3
 
     custom_range = range(left_index, right_index)
-    # print(custom_range, left_index, right_index)
     return query_set, custom_range

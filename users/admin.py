@@ -6,6 +6,9 @@ from .models import Skill
 
 
 class CustomUserAdmin(UserAdmin):
+    '''
+    A custom Admin for CustomUser model
+    '''
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = get_user_model()

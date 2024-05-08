@@ -48,7 +48,9 @@
                 {% endif %}
 
               </ul>
-              <a href="#" class="btn btn--sub btn--lg">Send Message </a>
+              {% if request.user != user %}
+              <a href="{% url 'projects:send_message' user.id %}?next={{request.path}}" class="btn btn--sub btn--lg">Send Message </a>
+              {% endif %}
             </div>
           </div>
         </div>

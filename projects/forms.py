@@ -1,9 +1,11 @@
 from django.forms import ModelForm
-from .models import Project, Review
+from .models import Project, Review, Inbox
 from django import forms
 
 class ProjectForm(ModelForm):
-
+    '''
+    Project model form
+    '''
     class Meta:
         model = Project
         fields = [
@@ -14,22 +16,17 @@ class ProjectForm(ModelForm):
             'tags': forms.CheckboxSelectMultiple(),
         }
 
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # self.fields['owner'].widget = forms.HiddenInput()
-        # self.fields is a dict containg a maping of form field names
-        # to form field instances
-        # the form field instances have a widget attribute which
-        # is also an instance of widget classes from django.forms
-        # these widget instances have an attrs attribute which is
-        # a dictionary of attribute to value
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'input'})
 
 
-class ReviewForm(ModelForm): 
+class ReviewForm(ModelForm):
+    '''
+    Review model form
+    '''
     class Meta:
         model = Review
         fields = ['value', 'body']
@@ -42,3 +39,17 @@ class ReviewForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['body'].widget.attrs.update({'class': 'input'})
         self.fields['value'].widget.attrs.update({'class': 'input'})
+
+class InboxForm(forms.ModelForm):
+    '''
+    Inbox model form
+    '''
+    class Meta:
+        model = Inbox
+        fields = ['title', 'body']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        print(self.fields)
+        self.fields['body'].widget.attrs.update({'class': 'input'})
+        self.fields['title'].widget.attrs.update({'class': 'input'})

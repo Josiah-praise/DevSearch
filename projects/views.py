@@ -9,13 +9,14 @@ from django.views.generic import (
     CreateView,
     UpdateView,
 )
-from .models import Project
+from .models import Project, Inbox
 from users.models import CustomUser
-from .forms import ProjectForm, ReviewForm
+from .forms import ProjectForm, ReviewForm, InboxForm
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .utils import paginate, search
+from datetime import datetime
 
 @login_required
 def ProjectList(request):
@@ -96,6 +97,7 @@ def delete_project(request, pk):
         return redirect("users:account")
     return render(request, 'confirm_delete.html', context)
 
+@login_required
 def review(request, pk):
     '''
     create review
@@ -116,3 +118,56 @@ def review(request, pk):
             request, 'projects/project_detail.html',
             {'project': project, 'form': form}
             )
+
+@login_required
+def inbox(request):
+    '''
+    render user's messages
+    '''
+    user = request.user
+    messages_ = Inbox.objects.filter(recipient=user)
+    unread = messages_.filter(is_read=False).count()
+    context = {'messages_': messages_, 'unread': unread}
+    return render(request, "projects/inbox.html", context)
+
+@login_required
+def inbox_detail(request, pk):
+    '''
+    shows details on an inbox instance
+    '''
+    # ensure a logged in user can only view a message
+    # that belongs to him
+    message = Inbox.objects.get(id=pk)
+    message_owner = message.recipient
+    context = {}
+    if message_owner == request.user:
+        message.is_read = True
+        message.read_at = datetime.now()
+        message.save()
+        context['message'] = message
+        return render(request, 'projects/message.html', context)
+    else:
+        return redirect("projects:inbox")
+
+@login_required
+def send_message(request, pk):
+    '''
+    send message to user with id=pk
+    '''
+    form = InboxForm()
+    recipient = CustomUser.objects.get(id=pk)
+    if request.method == 'POST':
+        form = InboxForm(request.POST)
+        if form.is_valid():
+            message_ = form.save(commit=False)
+            message_.recipient = recipient
+            message_.sender = request.user
+            message_.save()
+            messages.success(request, "Message sent")
+            return redirect(request.GET['next'])
+    context = {
+        'next': request.GET['next'],
+        'form': form,
+        'pk': pk
+        }
+    return render(request, 'projects/message_form.html', context)

@@ -4,6 +4,10 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 def developer_search(request):
+    '''
+    search developer model for records matching 
+    query string
+    '''
     q = request.GET.get("search_query", '')
     result =\
         CustomUser.search.search(q_string=q) if q else CustomUser.objects.all()
@@ -15,7 +19,9 @@ def developer_search(request):
 
 
 def paginate(request, result_count, q_set):
-    
+    '''
+    returns paginated query_set and custom paginator range
+    '''
     try:
         page_number = int(request.GET.get('page'))
     except:

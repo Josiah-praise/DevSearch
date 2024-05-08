@@ -7,6 +7,9 @@ from .customManagers import UserFilter, CustomManager
 
 
 class CustomUser(AbstractUser):
+    '''
+    Custom user model
+    '''
     email = models.EmailField(unique=True)
     short_intro = models.CharField(max_length=200, blank=True, null=True)
     bio = models.TextField(null=True, blank=True)
@@ -19,8 +22,8 @@ class CustomUser(AbstractUser):
     social_youtube = models.URLField(null=True, blank=True, max_length=1500)
     created_at = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False, unique=True)
-    
-    
+
+
     # when you use the authenticate function, it takes two values
     # username and password. This is because the USERNAME_FIELD on the
     # AbstractBaseUser is set to "username". If you want to use a different field
@@ -35,21 +38,24 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.get_full_name()
-    
+
     def get_absolute_url(self):
         return reverse('users:user_detail', args=(self.id,))
-    
+
     class Meta:
         ordering = ["created_at"]
 
 
-    
+
 class Skill(models.Model):
+    '''
+    skill model
+    '''
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False, unique=True)
-    
+
     def __str__(self):
         return str(self.name)

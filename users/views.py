@@ -10,8 +10,11 @@ from django.contrib import messages
 from .forms import CustomUserCreationForm, UserUpdateForm, Addskill
 # from django.contrib.auth import get_user_model
 from .utils import developer_search, paginate
-        
-def users(request, pk):
+
+def user_detail(request, pk):
+    '''
+    returns setails of user with id=pk
+    '''
     user = CustomUser.objects.get(id=pk)
     has_description= user.skill_set.exclude(description__exact='')
     no_description = user.skill_set.filter(description='')
@@ -24,6 +27,9 @@ def users(request, pk):
 
 
 def UserLogin(request):
+    '''
+    logs a registered user in
+    '''
     page = 'login'
     # if a logged in user tries to access this view with the bare url
     if request.user.is_authenticated:
@@ -55,6 +61,9 @@ def UserLogin(request):
     return render(request, 'users/login_form.html', {'next':next, 'page': page})
 
 def UserLogout(request):
+    '''
+    logout a logged in user
+    '''
     logout(request)
     messages.info(request, "You've been logged out")
     return redirect('users:login')
@@ -64,14 +73,20 @@ def UserLogout(request):
 
 @login_required
 def UserList(request):
+    '''
+    return a list of all users
+    '''
     context = developer_search(request)
     query_set, _range = paginate(request, 6, context["users"])
     context["users"] = query_set
     context["range"] = _range
-    
+
     return render(request, 'users/user_list.html', context)
 
 def register(request):
+    '''
+    register and then login a new user
+    '''
     if request.user.is_authenticated:
         return redirect(reverse('users:user_detail', args=(request.user.id,)))
 
@@ -94,6 +109,9 @@ def register(request):
 
 @login_required
 def userAccount(request):
+    '''
+    show the accounts page for the logged in user
+    '''
     user = request.user
     skills = user.skill_set.all()
 
@@ -105,9 +123,12 @@ def userAccount(request):
 
 @login_required
 def editAccount(request):
+    '''
+    edit user information
+    '''
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
-     
+
         if form.is_valid():
             user = form.save()
             return redirect('users:account')
@@ -123,6 +144,9 @@ def editAccount(request):
 
 @login_required
 def addskill(request):
+    '''
+    add skills
+    '''
     if request.method == "POST":
         form = Addskill(request.POST)
         if form.is_valid():
@@ -139,9 +163,12 @@ def addskill(request):
         }
         return render(request, "users/skill_form.html", context)
 
-            
+
 @login_required
 def updateskill(request, pk):
+    '''
+    update skills
+    '''
     user = request.user
 
     if not user.skill_set.filter(id=pk).exists():
@@ -163,6 +190,9 @@ def updateskill(request, pk):
 
 @login_required
 def delete_skill(request, pk):
+    '''
+    delete skills
+    '''
     user = request.user
 
     if user.skill_set.filter(id=pk).exists():
@@ -177,5 +207,3 @@ def delete_skill(request, pk):
         messages.success(request, "Delete Sucessful")
         return redirect("users:account")
     return render(request, 'confirm_delete.html', context)
-
-

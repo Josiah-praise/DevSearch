@@ -119,8 +119,8 @@ USE_TZ = True
 # email settings
 EMAIL_HOST = 'smtp.google.com'
 EMAIL_PORT = 465
-EMAIL_HOST_USER = 'praisechinonso21@gmail.com'
-EMAIL_HOST_PASSWORD = 'praisejosiah'
+EMAIL_HOST_USER = '*********'
+EMAIL_HOST_PASSWORD = '********'
 EMAIL_USE_TLS = True
 
 # Static files (CSS, JavaScript, Images)

@@ -2,7 +2,6 @@ from .models import CustomUser
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
-
 def developer_search(request):
     '''
     search developer model for records matching 

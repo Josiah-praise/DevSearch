@@ -143,7 +143,7 @@ def inbox_detail(request, pk):
     if message_owner == request.user:
         message.is_read = True
         message.read_at = datetime.now()
-        message.save()
+        message.save(update_fields=['is_read', 'read_at'])
         context['message'] = message
         return render(request, 'projects/message.html', context)
     else:

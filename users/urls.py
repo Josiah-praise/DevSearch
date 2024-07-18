@@ -6,7 +6,7 @@ app_name = 'users'
 urlpatterns = [
     # test view
     path('', views.UserList, name='user_list'),
-    path('detail/<str:pk>', views.users, name='user_detail'),
+    path('detail/<str:pk>', views.user_detail, name='user_detail'),
     path('login', views.UserLogin, name='login'),
     path('logout', views.UserLogout, name='logout'),
     path('register', views.register, name='register'),
